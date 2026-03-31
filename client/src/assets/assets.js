@@ -55,7 +55,8 @@ export const assets = {
     dropdown_icon,
     upload_icon,
     stripe_logo,
-    razorpay_logo
+    razorpay_logo,
+    empty_appointments: appointment_img,
 }
 
 export const specialityData = [

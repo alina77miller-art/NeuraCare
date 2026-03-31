@@ -5,12 +5,12 @@ import userModel from "../models/userModel.js";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
 import { v2 as cloudinary } from 'cloudinary'
-import stripe from "stripe";
-import razorpay from 'razorpay';
+import Stripe from "stripe";
+import Razorpay from 'razorpay';
 
-// Gateway Initialize
-const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
-const razorpayInstance = new razorpay({
+// Gateway Initialize (lazy — avoids crash if env vars are missing)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY)
+const getRazorpay = () => new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 })
@@ -238,7 +238,7 @@ const listAppointment = async (req, res) => {
 // API to make payment of appointment using razorpay
 const paymentRazorpay = async (req, res) => {
     try {
-
+        const razorpayInstance = getRazorpay()
         const { appointmentId } = req.body
         const appointmentData = await appointmentModel.findById(appointmentId)
 
@@ -267,6 +267,7 @@ const paymentRazorpay = async (req, res) => {
 // API to verify payment of razorpay
 const verifyRazorpay = async (req, res) => {
     try {
+        const razorpayInstance = getRazorpay()
         const { razorpay_order_id } = req.body
         const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
 
@@ -286,7 +287,7 @@ const verifyRazorpay = async (req, res) => {
 // API to make payment of appointment using Stripe
 const paymentStripe = async (req, res) => {
     try {
-
+        const stripeInstance = getStripe()
         const { appointmentId } = req.body
         const { origin } = req.headers
 
